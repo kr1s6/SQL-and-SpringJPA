@@ -323,3 +323,172 @@ This approach:
 
 * Prevents `StackOverflowError`
 * Safely displays relationship information
+
+---
+
+## JPA `@OneToMany` & `@ManyToOne`
+
+> Relationships are **optional by default**, which means you can create an entity without its related entities.
+> To make a relationship mandatory:
+>
+> ```java
+> @OneToOne(optional = false)
+> ```
+
+---
+
+## `@OneToMany`
+
+* Using `@OneToMany` on `Teacher` results in a **foreign key column in the `Course` table**
+* You will **not** see courses stored in the `Teacher` table
+* Instead, the `Course` table contains a reference to `Teacher`
+
+```java
+@Entity
+@Table(name = "teacher")
+public class Teacher {
+
+    @Id
+    @Column(name = "teacher_id")
+    private Long teacherId;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(
+        name = "teacher_id_name_for_course", // FK column in Course table
+        referencedColumnName = "teacher_id"  // PK column in Teacher table
+    )
+    private List<Course> courseList;
+}
+```
+
+📌 This is a **unidirectional** `@OneToMany` mapping.
+
+---
+
+## `@ManyToOne`
+
+✅ **Preferred approach**: always favor `@ManyToOne` over `@OneToMany` when possible.
+
+Reasons:
+
+* Simpler mapping
+* Better performance
+* More natural database design
+
+```java
+@Entity
+@Table(name = "course")
+public class Course {
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(
+        name = "teacher_id",
+        referencedColumnName = "teacher_id"
+    )
+    private Teacher teacher;
+}
+```
+
+---
+
+## `@ManyToMany`
+
+* Requires a **join table** to store the relationship
+* The join table maps IDs from both sides of the association
+
+```java
+@ManyToMany(cascade = CascadeType.ALL)
+@JoinTable(
+    name = "student_course_map",
+    joinColumns = @JoinColumn(
+        name = "course_id",            // FK for this entity
+        referencedColumnName = "courseId"
+    ),
+    inverseJoinColumns = @JoinColumn(
+        name = "student_id",           // FK for the related entity (Student)
+        referencedColumnName = "studentId"
+    )
+)
+private List<Student> students;
+```
+
+### Helper method
+
+```java
+public void addStudent(Student student) {
+    if (studentList == null) {
+        studentList = new ArrayList<>();
+    }
+    studentList.add(student);
+}
+```
+
+---
+
+## Paging & Sorting
+
+### Paging
+
+```java
+Pageable firstPageWithThreeRecords = PageRequest.of(0, 3);
+
+List<Course> courseList = courseRepository
+        .findAll(firstPageWithThreeRecords)
+        .getContent();
+
+System.out.println("Courses = " + courseList);
+
+long totalElements = courseRepository
+        .findAll(firstPageWithThreeRecords)
+        .getTotalElements();
+
+System.out.println("totalElements = " + totalElements);
+
+long totalPages = courseRepository
+        .findAll(firstPageWithThreeRecords)
+        .getTotalPages();
+
+// totalPages depends on page size and total record count
+System.out.println("totalPages = " + totalPages);
+```
+
+---
+
+### Sorting
+
+```java
+Pageable sortByTitle = PageRequest.of(0, 2, Sort.by("title"));
+
+Pageable sortByCreditDesc = PageRequest.of(
+    0, 2, Sort.by("credit").descending()
+);
+
+Pageable sortByTitleAndCreditDesc = PageRequest.of(
+    0, 2,
+    Sort.by("title").descending().and(Sort.by("credit"))
+);
+
+List<Course> courses = courseRepository
+        .findAll(sortByTitleAndCreditDesc)
+        .getContent();
+
+System.out.println(courses);
+```
+
+---
+
+### Paging + Sorting with Custom Query Method
+
+```java
+Page<Course> findByTitleContaining(String title, Pageable pageable);
+```
+
+```java
+Pageable sortByTitle = PageRequest.of(0, 2, Sort.by("title"));
+
+System.out.println(
+    courseRepository
+        .findByTitleContaining("kurs", sortByTitle)
+        .getContent()
+);
+```
