@@ -492,3 +492,174 @@ System.out.println(
         .getContent()
 );
 ```
+
+---
+
+## JPA Repository Interface
+
+By extending Spring Data JPA repository interfaces, you get **CRUD operations** and pagination support out-of-the-box.
+You can also define **custom queries** using method names or the `@Query` annotation.
+
+```java
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+}
+```
+
+### Query Method Examples
+
+```java
+Optional<List<Student>> findByFirstName(String name);          // Find records matching the exact name
+Optional<List<Student>> findByLastNameContaining(String name); // Find records containing the string
+List<Student> findByGuardianName(String name);                 // Find records in @Embedded class
+```
+
+[JPA Query Method Reference](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
+
+---
+
+## Automatic Custom Queries
+
+* Spring Data generates queries based on method names automatically.
+
+```java
+Optional<User> findByUsername(String username);
+boolean existsByUsername(String username);
+```
+
+---
+
+## Manual Custom Queries with `@Query`
+
+* Use **JPQL** (class-based query language)
+
+```java
+@Query("SELECT f FROM Foo f WHERE LOWER(f.name) = LOWER(:name)")
+Foo retrieveByName(@Param("name") String name);
+
+@Query("SELECT DISTINCT e FROM SoftwareEngineer e LEFT JOIN FETCH e.techStack")
+List<SoftwareEngineer> findAllWithTechStack();
+
+@Query("SELECT s FROM Student s WHERE s.emailId = ?1")
+Student getStudentByEmailAddress(String emailId);
+
+@Query("SELECT s.firstName FROM Student s WHERE s.emailId = ?1") // get only firstName
+String getStudentFirstNameByEmailAddress(String emailId);
+```
+
+> Notes:
+>
+> * `Student` refers to the **entity class**, not the table
+> * `?1`, `?2` refer to **method parameters by index**
+
+---
+
+## Native Queries
+
+* Use actual **database table and column names**
+
+```java
+@Query(
+    value = "SELECT * FROM student s WHERE s.email_address = ?1",
+    nativeQuery = true
+)
+Student getStudentByEmailAddressNative(String emailId);
+```
+
+### Named Parameters in Native Queries
+
+```java
+@Query(
+    value = "SELECT * FROM student s WHERE s.email_address = :emailId",
+    nativeQuery = true
+)
+Student getStudentByEmailAddressNativeNamedParam(@Param("emailId") String emailId);
+```
+
+---
+
+## `@Transactional` and `@Modifying`
+
+* Repository methods **do not have transactions by default**
+* **Updates/deletes** must be transactional and annotated with `@Modifying`
+
+```java
+@Transactional(readOnly = true)
+interface UserRepository extends JpaRepository<User, Long> {
+
+    List<User> findByLastname(String lastname);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM User u WHERE u.active = false")
+    void deleteInactiveUsers();
+
+    @Modifying
+    @Transactional
+    @Query(
+        value = "UPDATE student SET first_name = :firstName WHERE email_address = :emailId",
+        nativeQuery = true
+    )
+    int updateStudentNameByEmailId(String firstName, String emailId);
+}
+```
+
+* `readOnly = true` for queries that **only read data**
+* `@Modifying` overrides this for update/delete operations
+* Transactions ensure **all-or-nothing** behavior (rollback on exception)
+
+---
+
+## JPA Testing with `@DataJpaTest`
+
+* Focused on the **repository layer** without loading the full application context
+* Uses **in-memory database** (H2) by default
+
+```java
+@DataJpaTest
+public class StudentRepositoryTest {
+
+    @Autowired
+    StudentRepository studentRepository;
+
+    @Test
+    @DisplayName("Find student by id")
+    void givenStudentID_whenQuery_thenGetStudentObject() {
+        Student student = studentRepository.getReferenceById(1L);
+    }
+}
+```
+
+**Dependencies:**
+
+* `spring-boot-starter-data-jpa-test`
+* `spring-boot-starter-test`
+* H2 database
+
+---
+
+## `CommandLineRunner`
+
+* Executes code **after application context is loaded**
+* Useful for populating test/development data
+
+```java
+@Component
+@RequiredArgsConstructor
+public class StudentDataLoader implements CommandLineRunner {
+
+    private final StudentRepository studentRepository;
+
+    @Override
+    public void run(String... args) throws Exception {
+        studentRepository.save(new Student("Adam", "Grant", "Email"));
+        studentRepository.save(new Student("Edward", "Grant", "EmailFajny"));
+    }
+}
+```
+
