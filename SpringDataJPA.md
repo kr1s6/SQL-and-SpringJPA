@@ -202,7 +202,7 @@ public class Course {
 
 ---
 
-## JPA `@OneToMany` `@ManyToOne` `ManyToMany`
+## JPA `@OneToMany` &  `@ManyToOne` & `ManyToMany`
 Apparently it's **always better** to make `@ManyToOne` instead `@OneToMany` when possible
 * Simpler mapping
 * Better performance
