@@ -202,7 +202,7 @@ public class Course {
 
 ---
 
-## JPA `@OneToMany` & `@ManyToOne`
+## JPA `@OneToMany` `@ManyToOne` `ManyToMany`
 Apparently it's **always better** to make `@ManyToOne` instead `@OneToMany` when possible
 * Simpler mapping
 * Better performance
@@ -246,9 +246,7 @@ public class Teacher {
 }
 ```
 
----
-
-## `@ManyToMany`
+### `@ManyToMany`
 
 * Requires a **join table** to store the relationship
 * The join table maps IDs from both sides of the association
