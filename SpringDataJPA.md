@@ -421,8 +421,9 @@ Student getStudentByEmailAddressNativeNamedParam(@Param("emailId") String emailI
 
 ## `@Transactional` and `@Modifying`
 
+* `@Query` is treated as `SELECT` without `@Modifying`
 * Transactions ensure **all-or-nothing** behavior (rollback on exception
-* **Updates/deletes** must be transactional and annotated with `@Modifying`
+* **Inserts/updates/deletes** must be transactional and annotated with `@Modifying`
 * Repository methods **do not have transactions by default**
 
 
