@@ -446,8 +446,12 @@ VALUES
 (1, 'Street2', 'Warszawa'), 
 (2, 'Street3', 'Londyn');
 
-insert into person(id_address, last_name)
-values(1, 'Nowak'), (1, 'Januszkiewicz'), (2, 'Duurubu'), (3, 'Lsfafaf');
+insert into person(id_address, last_name, creation_date, modification_date)
+values
+(1, 'Nowak', now(), now()),
+(1, 'Januszkiewicz', now(), now()),
+(2, 'Duurubu', now(), now()),
+(3, 'Lsfafaf', now(), now());
 ```
 
 ### Selecting, grouping and filtering

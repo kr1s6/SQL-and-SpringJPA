@@ -396,8 +396,10 @@ String getStudentFirstNameByEmailAddress(String emailId);
 > * `:name` refer to `@Param` variable
 
 ### Native Queries
+* Use actual **database table and column names** 
 
-* Use actual **database table and column names**
+***WARNING***  
+**JPA Auditing `@CreatedDate` `@ModificationDate` isn't working for native queries**
 
 ```java
 @Query(
