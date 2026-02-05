@@ -17,6 +17,17 @@ It is recommended to annotate all tables and columns with names for better reada
 * **MySQL / MariaDB** → `IDENTITY`
 
 
+### UUID Strategy (`GenerationType.UUID`)
+**Choose UUIDs if:**
+* You’re working with distributed systems or microservices.
+* Security and global uniqueness are crucial.
+* Your application requires frequent data synchronization or merging.
+
+**Choose Incremental Integers if:**
+* Your application uses a single database.
+* You prioritize readability, simplicity, and high performance.
+* You have moderate security requirements.
+
 ### Identity Strategy (`GenerationType.IDENTITY`)
 
 * Very similar to the `AUTO` strategy
