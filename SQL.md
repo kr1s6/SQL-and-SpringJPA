@@ -204,6 +204,14 @@ VALUES
     (8, 'Rohit', 'Sharma', 3);
 ```
 
+## SQL Query Order
+1. FROM
+2. WHERE
+3. GROUP BY
+4. HAVING
+5. SELECT
+6. ORDER BY
+
 ## SELECT
 
 ```SQL
@@ -286,7 +294,7 @@ WHERE NOT Country = 'Spain';   /   WHERE CustomerName NOT LIKE 'A%';
 * `NOT`     - The negative result
 * `IS NULL` / `IS NOT NULL`
 
-#### HAVING
+### HAVING
 * The `HAVING` clause was added to SQL because the `WHERE` keyword cannot be used with aggregate functions.
 
 ```SQL
@@ -304,7 +312,7 @@ GROUP BY Country
 HAVING COUNT(CustomerID) > 5;
 ```
 
-#### AND & OR
+### AND & OR
 * The `WHERE` clause can contain one or many `AND` / `OR` operators.
 
 ```sql
@@ -325,7 +333,7 @@ SELECT * FROM Customers
 WHERE Country = 'Spain' AND CustomerName LIKE 'G%' OR CustomerName LIKE 'R%';
 ```
 
-##### IN
+### IN
 * Allows you to specify multiple values in a `WHERE` clause, it's shorthand for multiple OR conditions.
 
 **Return all customers from 'Germany', 'France', or 'UK'**  
@@ -334,7 +342,7 @@ SELECT * FROM Customers
 WHERE Country IN ('Germany', 'France', 'UK');
 ```
 
-#### LIKE
+### LIKE
 * Used in a `WHERE` clause to search for a specified pattern in a column.
     * The percent sign % represents zero, one, or multiple characters
     * The underscore sign _ represents one, single character
@@ -349,13 +357,26 @@ SELECT * FROM Customers
 WHERE city LIKE 'L_nd__';
 ```
 
-#### GROUP by
-* Groups rows that have the same values into summary rows, like "find the number of customers in each country".
-* Often used with aggregate functions (COUNT(), MAX(), MIN(), SUM(), AVG()) to group the result-set by one or more columns.
+### GROUP by
+* Groups rows that have the same values into summary rows, like "find the number of customers 
+in each country".
+* Often used with aggregate functions (COUNT(), MAX(), MIN(), SUM(), AVG()) to group the 
+result-set by one or more columns.
 
 ```SQL
 SELECT COUNT(CustomerID), Country FROM Customers
 GROUP BY Country;
+```
+
+* If there is aggregate function then every column in `SELECT` that is NOT 
+aggregate function must be `GROUP BY`
+```SQL
+SELECT
+    user_id,    -- must be in GROUP BY
+    username,   -- must be in GROUP BY
+    COUNT(...)  -- aggregate function
+FROM tweets
+GROUP BY user_id, username;
 ```
 
 ### ORDER BY
@@ -402,6 +423,36 @@ JOIN Professor pr ON pr.id_person = p.id_person
 ```
 **To oznacza:**  
 Pokaż tylko osoby, które są JEDNOCZEŚNIE studentem i profesorem
+
+## WITH
+Starts CTE definition, creating a temporary result set.
+
+```SQL
+WITH cte_name (column1, column2, ...)
+AS (
+    SELECT column1, column2, ...
+    FROM table_name
+    WHERE condition
+)
+SELECT *
+FROM cte_name;
+```
+## EXCEPT
+Returns rows from the first query that do not appear in the second.
+- Useful for identifying unmatched or missing records between tables.
+- returns only rows unique to the first SELECT
+
+```SQL
+SELECT column_name(s) 
+FROM table1
+EXCEPT
+SELECT column_name(s) 
+FROM table2;
+
+SELECT name FROM Students
+EXCEPT
+SELECT name FROM Students WHERE city = 'Berlin';
+```
 
 ## PostgreSQL implementing Database structure
 
