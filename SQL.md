@@ -437,6 +437,12 @@ AS (
 SELECT *
 FROM cte_name;
 ```
+## DATE
+```SQL
+WHERE query_starttime >= '2023-07-01T00:00:00Z'
+  AND query_starttime < '2023-10-01T00:00:00Z'
+```
+
 ## EXCEPT
 Returns rows from the first query that do not appear in the second.
 - Useful for identifying unmatched or missing records between tables.
