@@ -438,6 +438,7 @@ SELECT *
 FROM cte_name;
 ```
 ## DATE
+Date range to ensure entire last day of Semptember without including any part of October.
 ```SQL
 WHERE query_starttime >= '2023-07-01T00:00:00Z'
   AND query_starttime < '2023-10-01T00:00:00Z'
@@ -459,6 +460,13 @@ SELECT name FROM Students
 EXCEPT
 SELECT name FROM Students WHERE city = 'Berlin';
 ```
+
+## COALESCE
+Reaturns the first non-null value form a list of arguments
+```
+COALESCE(column_name, 'expression')
+```
+If `column_name` is NULL, it returns the specified 'expression'. 
 
 ## PostgreSQL implementing Database structure
 
